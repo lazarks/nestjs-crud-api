@@ -58,20 +58,26 @@ export class AuthService {
     // if pw incorrect throw exception
     if (!pwMatches) throw new ForbiddenException('Incorrect password.');
 
-    // send bak the user
+    // send back the user
     return this.signToken(user.id, user.email);
   }
 
-  async signToken(userId: number, email: string): Promise<string> {
+  async signToken(
+    userId: number,
+    email: string,
+  ): Promise<{ access_token: string }> {
     const payload = {
       sub: userId,
       email,
     };
     const secret = this.config.get('JWT_SECRET');
-
-    return this.jwt.signAsync(payload, {
+    const token = await this.jwt.signAsync(payload, {
       expiresIn: '15m',
       secret: secret,
     });
+
+    return {
+      access_token: token,
+    };
   }
 }
